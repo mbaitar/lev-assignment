@@ -137,7 +137,7 @@ func HandleStripeConnectCompleted(w http.ResponseWriter, r *http.Request) error 
 	if err != nil {
 		return err
 	}
-	if err := strp.FetchAllSubscriptions(token); err != nil {
+	if err := strp.FetchAllSubscriptions(token, user.ID); err != nil {
 		return err
 	}
 

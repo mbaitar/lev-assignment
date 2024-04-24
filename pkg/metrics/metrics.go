@@ -11,27 +11,24 @@ import (
 func CalculateMetrics(user uuid.UUID) error {
 	now := time.Now()
 	from := time.Date(now.Year(), time.January, 1, 0, 0, 0, 0, now.Location())
-	mrr, err := db.CalculateMRR()
+	mrr, err := db.CalculateMRR(user)
 	if err != nil {
 		return err
 	}
-	churn, err := db.CalculateChurn(from)
+	churn, err := db.CalculateChurn(user)
 	if err != nil {
 		return err
 	}
-	netGrowth, err := db.CalculateNetGrowth(from)
+	netGrowth, err := db.CalculateNetGrowth(from, user)
 	if err != nil {
 		return err
 	}
-	tradingLimit := db.CalculateTradingLimit(mrr)
-	if err != nil {
-		return err
-	}
+	tradingLimit := mrr * 30 / 100
 	metric := &types.Metric{
 		User:         user,
 		MRR:          mrr,
-		Churn:        churn,
-		NetGrowth:    netGrowth,
+		Churn:        float64(churn),
+		NetGrowth:    int64(netGrowth),
 		TradingLimit: tradingLimit,
 	}
 	err = db.CreateMetrics(metric)

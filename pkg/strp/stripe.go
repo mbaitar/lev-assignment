@@ -3,6 +3,7 @@ package strp
 import (
 	"context"
 	"database/sql"
+	"github.com/google/uuid"
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/types"
 	"github.com/stripe/stripe-go/v78"
@@ -13,7 +14,7 @@ import (
 	"time"
 )
 
-func FetchAllSubscriptions(token types.IntegrationToken) error {
+func FetchAllSubscriptions(token types.IntegrationToken, userID uuid.UUID) error {
 	stripe.Key = os.Getenv("STRIPE_API_KEY") // My api key
 
 	// Fetch all subscriptions from Stripe
@@ -26,21 +27,31 @@ func FetchAllSubscriptions(token types.IntegrationToken) error {
 	for iter.Next() {
 		sub := iter.Subscription()
 
-		var totalPrice int64
+		var totalPrice float64
 
 		for _, subItem := range sub.Items.Data {
 			if subItem.Price != nil {
-				totalPrice += subItem.Price.UnitAmount * subItem.Quantity
+				totalPrice += float64(subItem.Price.UnitAmountDecimal) / 100 * float64(subItem.Quantity)
 			}
 		}
 
+		var endDate time.Time
+		if sub.CancelAt != 0 {
+			endDate = time.Unix(sub.CancelAt, 0)
+		} else if sub.CurrentPeriodEnd > 0 {
+			endDate = time.Unix(sub.CurrentPeriodEnd, 0)
+		}
+
 		subscriptionData := &types.Subscription{
-			ID:        sub.ID,
-			Customer:  sub.Customer.ID,
-			Status:    string(sub.Status),
-			CreatedAt: time.Unix(sub.Created, 0),
-			Amount:    int(totalPrice),
-			Currency:  string(sub.Currency),
+			ID:                sub.ID,
+			Customer:          sub.Customer.ID,
+			UserID:            userID,
+			Status:            string(sub.Status),
+			CreatedAt:         time.Unix(sub.Created, 0),
+			Amount:            totalPrice,
+			Currency:          string(sub.Currency),
+			EndDate:           endDate,               // Added end date
+			CancelAtPeriodEnd: sub.CancelAtPeriodEnd, // Added this at
 		}
 
 		err := db.Bun.RunInTx(context.Background(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {

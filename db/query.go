@@ -55,21 +55,22 @@ func CreateSubscription(tx bun.Tx, sub *types.Subscription) error {
 	return err
 }
 
-func CalculateMRR() (int64, error) {
-	var totalMRR int64
+func CalculateMRR(userID uuid.UUID) (float64, error) {
+	var totalMRR float64
 	err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		ColumnExpr("SUM(amount) AS total_mrr").
 		Where("status = 'active'").
+		Where("user_id = ?", userID).
 		Scan(context.Background(), &totalMRR)
 	return totalMRR, err
 }
 
-func CalculateChurn(fromDate time.Time) (int, error) {
+func CalculateChurn(userID uuid.UUID) (int, error) {
 	count, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
-		Where("status = 'canceled'").
-		Where("created_at >= ?", fromDate).
+		Where("cancel_at_period_end >= 1").
+		Where("user_id = ?", userID).
 		Count(context.Background())
 	if err != nil {
 		return 0, err
@@ -78,25 +79,23 @@ func CalculateChurn(fromDate time.Time) (int, error) {
 	return count, nil
 }
 
-func CalculateNetGrowth(fromDate time.Time) (int, error) {
+func CalculateNetGrowth(fromDate time.Time, userID uuid.UUID) (int, error) {
 	newSubs, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		Where("status = 'active'").
 		Where("created_at >= ?", fromDate).
+		Where("user_id = ?", userID).
 		Count(context.Background())
 
 	canceledSubs, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		Where("status = 'canceled'").
 		Where("created_at >= ?", fromDate).
+		Where("user_id = ?", userID).
 		Count(context.Background())
 
 	netGrowth := newSubs - canceledSubs
 	return netGrowth, err
-}
-
-func CalculateTradingLimit(mrr int64) int64 {
-	return mrr * 30 / 100
 }
 
 func CreateMetrics(metrics *types.Metric) error {

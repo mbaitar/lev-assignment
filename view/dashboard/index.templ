@@ -24,7 +24,7 @@ templ Index(data ViewData) {
 
           <div class="stat">
             <div class="stat-title">Churn</div>
-            <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.Churn)) }</div>
+            <div class="stat-value">{ view.String(int(data.Metrics.Churn)) }</div>
           </div>
 
           <div class="stat">
