@@ -19,22 +19,22 @@ templ Index(data ViewData) {
 
           <div class="stat">
             <div class="stat-title">MRR</div>
-            <div class="stat-value">{ view.String(int(data.Metrics.MRR)) }</div>
+            <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.MRR)) }</div>
           </div>
 
           <div class="stat">
             <div class="stat-title">Churn</div>
-            <div class="stat-value">{ view.String(data.Metrics.Churn) }</div>
+            <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.Churn)) }</div>
           </div>
 
           <div class="stat">
             <div class="stat-title">Net Growth</div>
-            <div class="stat-value">{ view.String(data.Metrics.NetGrowth) }</div>
+            <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.NetGrowth)) }</div>
           </div>
 
           <div class="stat">
             <div class="stat-title">Trading Limit</div>
-            <div class="stat-value">{ view.String(int(data.Metrics.TradingLimit)) }</div>
+            <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.TradingLimit)) }</div>
           </div>
 
         </div>
