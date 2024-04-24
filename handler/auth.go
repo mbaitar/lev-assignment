@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mbaitar/levenue-assignment/db"
@@ -54,6 +55,41 @@ func HandleAccountSetupCreate(w http.ResponseWriter, r *http.Request) error {
 	return hxRedirect(w, r, "/")
 }
 
+func HandleAccountSetupTypeIndex(w http.ResponseWriter, r *http.Request) error {
+	return auth.AccountTypeSetup().Render(r.Context(), w)
+}
+
+func HandleAccountSetupTypeCreate(w http.ResponseWriter, r *http.Request) error {
+	accountType := r.FormValue("accountType")
+	fmt.Println(accountType)
+	user := getAuthenticatedUser(r)
+	account, err := db.GetAccountByUserID(user.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		acc := types.Account{
+			UserID: user.ID,
+			Type:   accountType,
+		}
+		if err := db.CreateAccount(&acc); err != nil {
+			return err
+		}
+		if accountType == "Seller" && !account.StripeConnected {
+			return hxRedirect(w, r, "/account/setup")
+		}
+		return hxRedirect(w, r, "/dashboard")
+	}
+
+	account.Type = accountType
+	if err := db.UpdateAccount(&account); err != nil {
+		return err
+	}
+
+	if accountType == "Seller" && !account.StripeConnected {
+		return hxRedirect(w, r, "/account/setup")
+	}
+
+	return hxRedirect(w, r, "/dashboard")
+}
+
 func HandleLoginIndex(w http.ResponseWriter, r *http.Request) error {
 	return render(r, w, auth.Login())
 }
@@ -102,6 +138,19 @@ func HandleLoginWithGoogle(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func HandleAuthCallback(w http.ResponseWriter, r *http.Request) error {
+	accessToken := r.URL.Query().Get("access_token")
+	if len(accessToken) == 0 {
+		return render(r, w, auth.CallbackScript())
+	}
+	if err := setAuthSession(w, r, accessToken); err != nil {
+		return err
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return nil
+}
+
 func HandleLoginCreate(w http.ResponseWriter, r *http.Request) error {
 	credentials := supabase.UserCredentials{
 		Email:    r.FormValue("email"),
@@ -128,9 +177,25 @@ func HandleStripeAuth(w http.ResponseWriter, r *http.Request) error {
 
 func HandleStripeConnectCompleted(w http.ResponseWriter, r *http.Request) error {
 	user := getAuthenticatedUser(r)
-	account := types.Account{
+	acc := types.Account{
 		UserID:          user.ID,
+		Type:            "SELLER",
 		StripeConnected: true,
+	}
+
+	account, err := db.GetAccountByUserID(user.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			if err := db.CreateAccount(&acc); err != nil {
+				return err
+			}
+		}
+		return err
+	} else {
+		account.StripeConnected = true
+		if err := db.UpdateAccount(&account); err != nil {
+			return err
+		}
 	}
 
 	token, err := db.GetTokenByUserID(user.ID)
@@ -145,23 +210,7 @@ func HandleStripeConnectCompleted(w http.ResponseWriter, r *http.Request) error 
 		return err
 	}
 
-	if err := db.CreateAccount(&account); err != nil {
-		return err
-	}
-
 	return hxRedirect(w, r, "/dashboard")
-}
-
-func HandleAuthCallback(w http.ResponseWriter, r *http.Request) error {
-	accessToken := r.URL.Query().Get("access_token")
-	if len(accessToken) == 0 {
-		return render(r, w, auth.CallbackScript())
-	}
-	if err := setAuthSession(w, r, accessToken); err != nil {
-		return err
-	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	return nil
 }
 
 func HandleStripeAuthCallback(w http.ResponseWriter, r *http.Request) error {

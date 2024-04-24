@@ -3,6 +3,37 @@ package auth
 import "github.com/mbaitar/levenue-assignment/view/layout"
 import "github.com/nedpals/supabase-go"
 
+type AccountTypeSetupFormError struct {
+    Type string
+}
+
+templ AccountTypeSetup() {
+	@layout.App(true) {
+		<div class="max-w-xl bg-base-300 px-6 py-12 w-full mx-auto mt-4 rounded-xl">
+			<h1 class="text-xl font-black mb-8 text-center">Lets connect to stripe</h1>
+				<form hx-post="/account/setup/type" hx-swap="outerHTML" class="">
+            		<div class="flex justify-center align-center">
+                        <div class="form-control">
+                          <label class="label cursor-pointer">
+                            <span class="label-text px-1">Buyer</span>
+                            <input type="radio" name="accountType" value="BUYER" class="radio" checked />
+                          </label>
+                        </div>
+                        <div class="form-control">
+                          <label class="label cursor-pointer">
+                            <span class="label-text px-1">Seller</span>
+                            <input type="radio" name="accountType" value="SELLER" class="radio" checked />
+                          </label>
+                        </div>
+            		</div>
+            		<div class="flex justify-center align-center pt-3">
+            		   <button class="btn btn-primary">Confirm</button>
+            		</div>
+            	</form>
+		</div>
+	}
+}
+
 templ AccountSetup() {
 	@layout.App(true) {
 		<div class="max-w-xl bg-base-300 px-6 py-12 w-full mx-auto mt-4 rounded-xl">
@@ -131,6 +162,8 @@ templ SignupForm(params SignupParams, errors SignupErrors) {
 			}
 		</div>
 		<button type="submit" class="btn btn-primary w-full">login <i class="fa-solid fa-arrow-right"></i></button>
+		<div class="divider">OR</div>
+        <a href="/login/provider/google" class="btn btn-outline w-full">login with Google <i class="fa-brands fa-google"></i></a>
 	</form>
 }
 
@@ -174,6 +207,9 @@ templ LoginForm(creds supabase.UserCredentials, errors LoginErrors) {
 		<button type="submit" class="btn btn-primary w-full">login <i class="fa-solid fa-arrow-right"></i></button>
 		<div class="divider">OR</div>
 		<a href="/login/provider/google" class="btn btn-outline w-full">login with Google <i class="fa-brands fa-google"></i></a>
+		<div class="flex justify-center align-center">
+		    <h3>Don't have an account? <a href="/signup" class="text-primary underline">Sign up here</a></h3>
+		</div>
 	</form>
 }
 

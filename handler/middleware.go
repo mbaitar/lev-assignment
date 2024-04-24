@@ -71,10 +71,18 @@ func WithAccountSetup(next http.Handler) http.Handler {
 		account, err := db.GetAccountByUserID(user.ID)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				http.Redirect(w, r, "/account/setup", http.StatusSeeOther)
+				http.Redirect(w, r, "/account/setup/type", http.StatusSeeOther)
 				return
 			}
 			next.ServeHTTP(w, r)
+			return
+		}
+		if len(account.Type) == 0 {
+			http.Redirect(w, r, "/account/setup/type", http.StatusSeeOther)
+			return
+		}
+		if account.Type == "SELLER" && !account.StripeConnected {
+			http.Redirect(w, r, "/account/setup", http.StatusSeeOther)
 			return
 		}
 		user.Account = account

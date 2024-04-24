@@ -24,6 +24,14 @@ func CreateAccount(account *types.Account) error {
 	return err
 }
 
+func UpdateAccount(account *types.Account) error {
+	_, err := Bun.NewUpdate().
+		Model(account).
+		WherePK().
+		Exec(context.Background())
+	return err
+}
+
 func CreateIntegrationTokens(token *types.IntegrationToken) error {
 	_, err := Bun.NewInsert().
 		Model(token).
@@ -66,17 +74,56 @@ func CalculateMRR(userID uuid.UUID) (float64, error) {
 	return totalMRR, err
 }
 
-func CalculateChurn(userID uuid.UUID) (int, error) {
+func CalculateChurn(fromDate time.Time, userID uuid.UUID) (int, error) {
 	count, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
-		Where("cancel_at_period_end >= 1").
+		Where("cancel_at_period_end = 1").
 		Where("user_id = ?", userID).
+		Where("created_at >= ?", fromDate).
 		Count(context.Background())
 	if err != nil {
 		return 0, err
 	}
 
 	return count, nil
+}
+
+func CalculateChurnedMRR(fromDate time.Time, userID uuid.UUID) (float64, error) {
+	var churnedMRR float64
+	err := Bun.NewSelect().
+		Model((*types.Subscription)(nil)).
+		ColumnExpr("SUM(amount) AS churned_mrr").
+		Where("cancel_at_period_end = 1").
+		Where("user_id = ?", userID).
+		Scan(context.Background(), &churnedMRR)
+
+	return float64(churnedMRR), err
+}
+
+func CalculateChurnPercentage(fromDate time.Time, userID uuid.UUID) (float64, error) {
+	churned, err := Bun.NewSelect().
+		Model((*types.Subscription)(nil)).
+		Where("cancel_at_period_end = 1").
+		Where("user_id = ?", userID).
+		Where("created_at >= ?", fromDate).
+		Count(context.Background())
+
+	if err != nil {
+		return 0, err
+	}
+
+	total, err := Bun.NewSelect().
+		Model((*types.Subscription)(nil)).
+		Where("status = 'active'").
+		Where("created_at >= ?", fromDate).
+		Count(context.Background())
+
+	if err != nil {
+		return 0, err
+	}
+
+	churnPercentage := (float64(churned) / float64(total)) * 100
+	return churnPercentage, nil
 }
 
 func CalculateNetGrowth(fromDate time.Time, userID uuid.UUID) (int, error) {
@@ -119,4 +166,21 @@ func GetMetricByUserID(userID uuid.UUID) (types.Metric, error) {
 		Where("user_id = ?", userID.String()).
 		Scan(context.Background())
 	return metric, err
+}
+
+func CreateTrade(trade *types.Trade) error {
+	_, err := Bun.NewInsert().
+		Model(trade).
+		Exec(context.Background())
+	return err
+}
+
+func GetTradesByUserID(userID uuid.UUID) ([]types.Trade, error) {
+	var trades []types.Trade
+	err := Bun.NewSelect().
+		Model(&trades).
+		Where("buyer = ?", userID).
+		Order("id ASC").
+		Scan(context.Background())
+	return trades, err
 }

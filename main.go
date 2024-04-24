@@ -39,6 +39,8 @@ func main() {
 		auth.Use(handler.WithAuth)
 		auth.Get("/account/setup", handler.Make(handler.HandleAccountSetupIndex))
 		auth.Post("/account/setup", handler.Make(handler.HandleAccountSetupCreate))
+		auth.Get("/account/setup/type", handler.Make(handler.HandleAccountSetupTypeIndex))
+		auth.Post("/account/setup/type", handler.Make(handler.HandleAccountSetupTypeCreate))
 		auth.Post("/account/stripe/onboarding", handler.Make(handler.HandleStripeAuth))
 		auth.Get("/account/stripe/completed", handler.Make(handler.HandleStripeConnectCompleted))
 	})
@@ -46,6 +48,8 @@ func main() {
 	router.Group(func(auth chi.Router) {
 		auth.Use(handler.WithAuth, handler.WithAccountSetup)
 		auth.Get("/dashboard", handler.Make(handler.HandleDashboardIndex))
+		auth.Post("/trade", handler.Make(handler.HandleTradeCreate))
+		auth.Get("/history", handler.Make(handler.HandleHistoryIndex))
 	})
 
 	port := os.Getenv("HTTP_LISTEN_ADDR")

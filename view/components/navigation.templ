@@ -12,6 +12,9 @@ templ Navigation() {
 		<div class="flex-none">
 			<ul class="menu menu-horizontal px-1">
 				if view.AuthenticatedUser(ctx).LoggedIn {
+                   if view.AuthenticatedUser(ctx).Type == "BUYER" {
+                       <li><a href="/history"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
+                    }
 					<li><a href="/dashboard"><i class="fa-solid fa-wand-magic-sparkles"></i> Dashboard</a></li>
 					<li>
 						<details>

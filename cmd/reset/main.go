@@ -27,9 +27,9 @@ func main() {
 		"schema_migrations",
 		"accounts",
 		"integration_tokens",
-		"metric",
 		"subscriptions",
 		"metrics",
+		"trades",
 	}
 
 	for _, table := range tables {

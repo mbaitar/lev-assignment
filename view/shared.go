@@ -20,6 +20,10 @@ func String(i int) string {
 	return strconv.Itoa(i)
 }
 
+func Float64(i float64) string {
+	return strconv.FormatFloat(i, 'f', 2, 64)
+}
+
 func FormatCurrency(i float64) string {
 	formatted := fmt.Sprintf("%.2f", i)
 	parts := strings.Split(formatted, ".")
