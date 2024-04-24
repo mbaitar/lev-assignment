@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const discountRate = 0.88
+
 func CalculateMetrics(user uuid.UUID) error {
 	now := time.Now()
 	from := time.Date(now.Year(), time.January, 1, 0, 0, 0, 0, now.Location())
@@ -52,4 +54,19 @@ func CalculateMetrics(user uuid.UUID) error {
 		return err
 	}
 	return nil
+}
+
+func CalculateTrade(arr float64, userID uuid.UUID) *types.Trade {
+	investment := arr * discountRate
+	netProfit := arr - investment
+	roiPercentage := (netProfit / investment) * 100
+	trade := &types.Trade{
+		Buyer:         userID,
+		ARRTraded:     arr,
+		DiscountRate:  discountRate,
+		ROI:           netProfit,
+		ROIPercentage: roiPercentage,
+		NetProfit:     netProfit,
+	}
+	return trade
 }
