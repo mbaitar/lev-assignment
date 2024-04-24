@@ -7,5 +7,4 @@ import (
 
 func HandleHomeIndex(w http.ResponseWriter, r *http.Request) error {
 	return render(r, w, home.Index())
-	// return home.Index().Render(r.Context(), w)
 }
