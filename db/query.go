@@ -75,9 +75,9 @@ func CalculateMRR(userID uuid.UUID) (float64, error) {
 }
 
 func CalculateChurn(fromDate time.Time, userID uuid.UUID) (int, error) {
-	count, err := Bun.NewSelect().
+	churned, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
-		Where("cancel_at_period_end = 1").
+		Where("cancel_at_period_end = 1 OR status = 'canceled'").
 		Where("user_id = ?", userID).
 		Where("created_at >= ?", fromDate).
 		Count(context.Background())
@@ -85,7 +85,7 @@ func CalculateChurn(fromDate time.Time, userID uuid.UUID) (int, error) {
 		return 0, err
 	}
 
-	return count, nil
+	return churned, nil
 }
 
 func CalculateChurnedMRR(fromDate time.Time, userID uuid.UUID) (float64, error) {
@@ -93,7 +93,7 @@ func CalculateChurnedMRR(fromDate time.Time, userID uuid.UUID) (float64, error) 
 	err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		ColumnExpr("SUM(amount) AS churned_mrr").
-		Where("cancel_at_period_end = 1").
+		Where("cancel_at_period_end = 1 OR status = 'canceled'").
 		Where("user_id = ?", userID).
 		Scan(context.Background(), &churnedMRR)
 
@@ -103,7 +103,7 @@ func CalculateChurnedMRR(fromDate time.Time, userID uuid.UUID) (float64, error) 
 func CalculateChurnPercentage(fromDate time.Time, userID uuid.UUID) (float64, error) {
 	churned, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
-		Where("cancel_at_period_end = 1").
+		ColumnExpr("cancel_at_period_end = 1 OR status = 'canceled'").
 		Where("user_id = ?", userID).
 		Where("created_at >= ?", fromDate).
 		Count(context.Background())
@@ -122,7 +122,7 @@ func CalculateChurnPercentage(fromDate time.Time, userID uuid.UUID) (float64, er
 		return 0, err
 	}
 
-	churnPercentage := (float64(churned) / float64(total)) * 100
+	churnPercentage := float64(churned/total) * 100
 	return churnPercentage, nil
 }
 
@@ -136,7 +136,7 @@ func CalculateNetGrowth(fromDate time.Time, userID uuid.UUID) (int, error) {
 
 	canceledSubs, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
-		Where("status = 'canceled'").
+		ColumnExpr("cancel_at_period_end = 1 OR status = 'canceled'").
 		Where("created_at >= ?", fromDate).
 		Where("user_id = ?", userID).
 		Count(context.Background())
