@@ -1,0 +1,43 @@
+package dashboard
+
+import "github.com/mbaitar/levenue-assignment/view"
+import "github.com/mbaitar/levenue-assignment/view/layout"
+import "github.com/mbaitar/levenue-assignment/types"
+
+
+type ViewData struct {
+	Metrics     types.Metric
+}
+
+templ Index(data ViewData) {
+	@layout.App(true) {
+    <div class="w-full max-w-screen-xl mx-auto text-center py-12">
+        <h1 class="text-5xl font-black leading-[1.2] mb-2">
+            Welcome to the dashboard
+        </h1>
+        <div class="stats stats-vertical lg:stats-horizontal shadow">
+
+          <div class="stat">
+            <div class="stat-title">MRR</div>
+            <div class="stat-value">{ view.String(int(data.Metrics.MRR)) }</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-title">Churn</div>
+            <div class="stat-value">{ view.String(data.Metrics.Churn) }</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-title">Net Growth</div>
+            <div class="stat-value">{ view.String(data.Metrics.NetGrowth) }</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-title">Trading Limit</div>
+            <div class="stat-value">{ view.String(int(data.Metrics.TradingLimit)) }</div>
+          </div>
+
+        </div>
+    </div>
+    }
+}

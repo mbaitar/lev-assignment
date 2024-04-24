@@ -2,3 +2,9 @@ bin
 .idea
 .env
 .DS_Store
+node_modules
+vendor
+*_templ.go*
+*_templ.txt*
+levenue.db
+tmp

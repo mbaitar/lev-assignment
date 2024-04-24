@@ -1,0 +1,39 @@
+package components
+
+import (
+	"github.com/mbaitar/levenue-assignment/view"
+)
+
+templ Navigation() {
+	<div class="navbar bg-base-100 border-b border-gray-700">
+		<div class="flex-1">
+			<a href="/" class="text-2xl font-black text-primary">Levenue</a>
+		</div>
+		<div class="flex-none">
+			<ul class="menu menu-horizontal px-1">
+				if view.AuthenticatedUser(ctx).LoggedIn {
+					<li><a href="/dashboard"><i class="fa-solid fa-wand-magic-sparkles"></i> Dashboard</a></li>
+					<li>
+						<details>
+							<summary>
+								{ view.AuthenticatedUser(ctx).Email }
+							</summary>
+							<ul class="p-2 bg-base-100 rounded-t-none">
+								<li><a href="/settings">Settings</a></li>
+								@LogoutForm()
+							</ul>
+						</details>
+					</li>
+				} else {
+					<a href="/login" class="btn btn-primary">Login</a>
+				}
+			</ul>
+		</div>
+	</div>
+}
+
+templ LogoutForm() {
+	<form method="POST" action="/logout">
+		<li><button type="submit" class="btn btn-link">Logout</button></li>
+	</form>
+}

@@ -1,16 +1,16 @@
 package main
 
 import (
-	"log"
-	"log/slog"
-	"math/rand"
-	"sync"
-	"time"
-
-	"github.com/bxcodec/faker/v3" // for generating fake data
+	"github.com/go-faker/faker/v4"
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/customer"
 	"github.com/stripe/stripe-go/v78/subscription"
+	"log"
+	"log/slog"
+	"math/rand"
+	"os"
+	"sync"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -22,9 +22,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	stripe.Key = "sk_test_51ObgOGD9fA4p74AFlYu2FsPTgzQj51SNKwSJlKzMbLDoTjR73Y9UTGWmeWxqzoiDRVGrM17Un9chVUwYUPMLlQKA00CNokpmiP" // Your Stripe Test Key
+	stripe.Key = os.Getenv("STRIPE_API_KEY_TEST_USER")
 
-	var priceIDs = []string{"price_1P8OEWD9fA4p74AFfD1tXrlH", "price_1P8OErD9fA4p74AFhtijxfQn", "price_1P8OF6D9fA4p74AFKXwpcz37"} // Your Stripe price IDs 9.99 - 19.99 - 49.99
+	// var priceIDs = []string{"price_1P8OEWD9fA4p74AFfD1tXrlH", "price_1P8OErD9fA4p74AFhtijxfQn", "price_1P8OF6D9fA4p74AFKXwpcz37"} // 9.99 - 19.99 - 49.99
+	var priceIDs = []string{"price_1P901hK6VtaRtZVAn2fNTWhP", "price_1P901UK6VtaRtZVAdLdmbrq5", "price_1P901LK6VtaRtZVAm4dveHMe"}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	var wg sync.WaitGroup
