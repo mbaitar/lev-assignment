@@ -8,6 +8,8 @@
 
 ## Description
 This application is designed based on the assignment given to me
+A seller can see metrics about his subscription after fully onboarded
+A Buyer can trade ARR and see his trades in a overview
 
 ## Requirements
 - [Golang](https://golang.org/dl/) (version 1.22.x or later)
@@ -67,7 +69,7 @@ This application is designed based on the assignment given to me
 
 
 ### Sign-in with google
-1. Follow [this guide](https://supabase.com/docs/guides/auth/social-login/auth-google) on how to set login with Google
+1. Follow [this guide](https://supabase.com/docs/guides/auth/social-login/auth-google) on how to configure login with Google on Supabase
 
 ## Start the app
 1. install dependencies
