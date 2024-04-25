@@ -19,7 +19,6 @@ func FetchAllSubscriptions(token types.IntegrationToken, userID uuid.UUID) error
 
 	// Fetch all subscriptions from Stripe
 	params := &stripe.SubscriptionListParams{}
-	params.Filters.AddFilter("limit", "", "100") // Fetch first 100 subscriptions
 	params.SetStripeAccount(token.ConnectedAccountId)
 
 	iter := subscription.List(params)
@@ -50,8 +49,8 @@ func FetchAllSubscriptions(token types.IntegrationToken, userID uuid.UUID) error
 			CreatedAt:         time.Unix(sub.Created, 0),
 			Amount:            totalPrice,
 			Currency:          string(sub.Currency),
-			EndDate:           endDate,               // Added end date
-			CancelAtPeriodEnd: sub.CancelAtPeriodEnd, // Added this at
+			EndDate:           endDate,
+			CancelAtPeriodEnd: sub.CancelAtPeriodEnd,
 		}
 
 		err := db.Bun.RunInTx(context.Background(), &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
