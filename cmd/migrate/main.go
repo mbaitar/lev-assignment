@@ -26,17 +26,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Create migrate instance
 	driver, err := sqlite.WithInstance(instance, &sqlite.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Point to your migrate files. Here we're using local files, but it could be other sources.
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://cmd/migrate/migrations", // source URL
-		"sqlite",                        // database name
-		driver,                          // database instance
+		"file://cmd/migrate/migrations",
+		"sqlite",
+		driver,
 	)
 	if err != nil {
 		log.Fatal(err)

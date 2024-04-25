@@ -15,9 +15,8 @@ import (
 )
 
 func FetchAllSubscriptions(token types.IntegrationToken, userID uuid.UUID) error {
-	stripe.Key = os.Getenv("STRIPE_API_KEY") // My api key
+	stripe.Key = os.Getenv("STRIPE_API_KEY")
 
-	// Fetch all subscriptions from Stripe
 	params := &stripe.SubscriptionListParams{}
 	params.SetStripeAccount(token.ConnectedAccountId)
 

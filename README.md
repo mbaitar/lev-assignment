@@ -46,10 +46,15 @@ A Buyer can trade ARR and see his trades in a overview
 13. Click on the `OAuth` tab and enable the `OAuth for standard accounts` option 
 14. On the same page copy the `Test mode client ID`
 15. Paste it in the `.env` file => `STRIPE_CLIENT_ID={{YOUR_KEY}}`
-16. On the left top side you will find your company name click on it 
-17. Now choose a second company name and press `next`
-18. A new dashboard will open up, now follow `step 3` until `step 6`
-19. Paste the copied key in the `.env` file => `STRIPE_API_KEY_TEST_USER={{YOUR_KEY}}`
+16. Next in left sidebar click `more`
+17. Find the `Product Catalogue` option in the menu that pops open
+18. Create 3 products by clicking on the `+ Add product` button on the top right
+19. Once done, click each product open and locate the `API ID` these IDs start with `price_`
+20. Copy the ID and paste it in the `.env` file => `STRIPE_PRICE_X={{YOUR_KEY}}` and repeat it 2 more times
+21. On the left top side you will find your company name click on it 
+22. Now choose a second company name and press `next`
+23. A new dashboard will open up, now follow `step 3` until `step 6`
+24. Paste the copied key in the `.env` file => `STRIPE_API_KEY_TEST_USER={{YOUR_KEY}}`
 
 ### Supabase
 1. Signup for an account on [Supabase](https://supabase.com/dashboard/sign-up) or login if you already have an account

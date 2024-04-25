@@ -24,8 +24,7 @@ func main() {
 
 	stripe.Key = os.Getenv("STRIPE_API_KEY_TEST_USER")
 
-	// var priceIDs = []string{"price_1P8OEWD9fA4p74AFfD1tXrlH", "price_1P8OErD9fA4p74AFhtijxfQn", "price_1P8OF6D9fA4p74AFKXwpcz37"} // 9.99 - 19.99 - 49.99
-	var priceIDs = []string{"price_1P901hK6VtaRtZVAn2fNTWhP", "price_1P901UK6VtaRtZVAdLdmbrq5", "price_1P901LK6VtaRtZVAm4dveHMe"}
+	var priceIDs = []string{os.Getenv("STRIPE_PRICE_1"), os.Getenv("STRIPE_PRICE_2"), os.Getenv("STRIPE_PRICE_3")}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	var wg sync.WaitGroup
