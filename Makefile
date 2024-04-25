@@ -1,6 +1,6 @@
 build:
-	@go build -tags dev -o bin/lev-app main.go
-	@go build -o bin/data cmd/data/main.go
+	@templ generate view
+	@go build -tags prod -o bin/app .
 
 databuild:
 	@go build -o bin/data cmd/data/main.go
@@ -9,7 +9,7 @@ data: databuild
 	@./bin/data
 
 run: build
-	@./bin/lev-app
+	@./bin/app
 
 install:
 	@go install github.com/a-h/templ/cmd/templ@latest
@@ -26,9 +26,6 @@ css:
 templ:
 	@templ generate --watch --proxy=http://localhost:3000
 
-setupdb:
-	@sqlite3 lev.db
-
 up: ## Database migration up
 	@go run cmd/migrate/main.go up
 
@@ -40,3 +37,7 @@ down: ## Database migration down
 
 migration: ## Migrations against the database
 	@migrate create -ext sql -dir cmd/migrate/migrations $(filter-out $@,$(MAKECMDGOALS))
+
+test:
+	@go test ./... -v
+

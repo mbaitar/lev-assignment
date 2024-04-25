@@ -53,7 +53,7 @@ func generateDummyData(rng *rand.Rand, priceIDs []string, workerID int) {
 
 	newCustomer, err := customer.New(customerParams)
 	if err != nil {
-		slog.Error("Worker", workerID, "Creating customer", "err", err)
+		slog.Error("Creating customer", "Worker", workerID, "err", err)
 		return
 	}
 
@@ -82,7 +82,7 @@ func generateDummyData(rng *rand.Rand, priceIDs []string, workerID int) {
 
 	_, err = subscription.New(subscriptionParams)
 	if err != nil {
-		slog.Error("Worker", workerID, "Creating subscription", "err", err)
+		slog.Error("Creating subscription", "Worker", workerID, "err", err)
 		return
 	}
 

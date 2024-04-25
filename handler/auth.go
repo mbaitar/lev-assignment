@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mbaitar/levenue-assignment/db"
-	"github.com/mbaitar/levenue-assignment/pkg/kit/validate"
 	"github.com/mbaitar/levenue-assignment/pkg/metrics"
 	"github.com/mbaitar/levenue-assignment/pkg/sb"
 	"github.com/mbaitar/levenue-assignment/pkg/strp"
@@ -104,25 +103,25 @@ func HandleSignupCreate(w http.ResponseWriter, r *http.Request) error {
 		Password:        r.FormValue("password"),
 		ConfirmPassword: r.FormValue("confirmPassword"),
 	}
-	errors := auth.SignupErrors{}
-	if ok := validate.New(&params, validate.Fields{
-		"Email":    validate.Rules(validate.Email),
-		"Password": validate.Rules(validate.Password),
-		"ConfirmPassword": validate.Rules(
-			validate.Equal(params.Password),
-			validate.Message("passwords do not match"),
-		),
-	}).Validate(&errors); !ok {
-		return render(r, w, auth.SignupForm(params, errors))
+	if params.Password != params.ConfirmPassword {
+		errs := auth.SignupErrors{
+			Password:        "Passwords do not match",
+			ConfirmPassword: "Passwords do not match",
+		}
+		return render(r, w, auth.SignupForm(params, errs))
 	}
-	user, err := sb.Client.Auth.SignUp(r.Context(), supabase.UserCredentials{
+	_, err := sb.Client.Auth.SignUp(r.Context(), supabase.UserCredentials{
 		Email:    params.Email,
 		Password: params.Password,
 	})
 	if err != nil {
-		return err
+		slog.Error("s", "err", err)
+		errors := auth.SignupErrors{
+			SupaBaseError: err.Error(),
+		}
+		return render(r, w, auth.SignupForm(params, errors))
 	}
-	return render(r, w, auth.SignupSuccess(user.Email))
+	return hxRedirect(w, r, "/login")
 }
 
 func HandleLoginWithGoogle(w http.ResponseWriter, r *http.Request) error {
@@ -171,7 +170,7 @@ func HandleLoginCreate(w http.ResponseWriter, r *http.Request) error {
 
 func HandleStripeAuth(w http.ResponseWriter, r *http.Request) error {
 	user := r.Context().Value(types.UserContextKey).(types.AuthenticatedUser)
-	url := fmt.Sprintf("https://connect.stripe.com/oauth/authorize?response_type=code&client_id=%s&scope=read_write&redirect_uri=http://localhost:7331/account/stripe/callback&state=%s", os.Getenv("STRIPE_CLIENT_ID"), user.ID)
+	url := fmt.Sprintf("https://connect.stripe.com/oauth/authorize?response_type=code&client_id=%s&scope=read_write&redirect_uri=http://localhost%s/account/stripe/callback&state=%s", os.Getenv("STRIPE_CLIENT_ID"), os.Getenv("HTTP_LISTEN_ADDR"), user.ID)
 	return hxRedirect(w, r, url)
 }
 

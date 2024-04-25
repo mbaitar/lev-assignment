@@ -120,6 +120,7 @@ type SignupErrors struct {
 	Email           string
 	Password        string
 	ConfirmPassword string
+	SupaBaseError   string
 }
 
 templ SignupForm(params SignupParams, errors SignupErrors) {
@@ -129,6 +130,11 @@ templ SignupForm(params SignupParams, errors SignupErrors) {
 		class="space-y-4"
 	>
 		<div class="w-full">
+            if len(errors.SupaBaseError) > 0 {
+                <div class="label">
+                    <span class="label-text-alt text-error">{ errors.SupaBaseError }</span>
+                </div>
+            }
 			<div class="label">
 				<span class="label-text">Email address</span>
 			</div>
