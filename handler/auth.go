@@ -61,7 +61,6 @@ func HandleAccountSetupTypeIndex(w http.ResponseWriter, r *http.Request) error {
 
 func HandleAccountSetupTypeCreate(w http.ResponseWriter, r *http.Request) error {
 	accountType := r.FormValue("accountType")
-	fmt.Println(accountType)
 	user := getAuthenticatedUser(r)
 	account, err := db.GetAccountByUserID(user.ID)
 	if errors.Is(err, sql.ErrNoRows) {

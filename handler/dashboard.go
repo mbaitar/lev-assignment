@@ -12,7 +12,7 @@ import (
 func HandleDashboardIndex(w http.ResponseWriter, r *http.Request) error {
 	user := getAuthenticatedUser(r)
 	if user.Type == "SELLER" {
-		metrics, err := db.GetMetricByUserID(user.ID)
+		metrics, err := db.GetLatestMetricByUserID(user.ID)
 		if err != nil {
 			return err
 		}

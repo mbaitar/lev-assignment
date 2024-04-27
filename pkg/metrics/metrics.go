@@ -13,7 +13,7 @@ const discountRate = 0.88
 
 func CalculateMetrics(user uuid.UUID) error {
 	now := time.Now()
-	from := time.Date(now.Year(), time.January, 1, 0, 0, 0, 0, now.Location())
+	from := time.Date(now.Year(), time.January, 1, 0, 0, 0, 0, now.Location()).Format("2006-01-02 15:04:05")
 	mrr, err := db.CalculateMRR(user)
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func CalculateMetrics(user uuid.UUID) error {
 		return err
 	}
 
-	churnPercentage, err := db.CalculateChurnPercentage(from, user)
+	churnPercentage, err := db.CalculateChurnPercentage(from, user, churnAmount)
 	if err != nil {
 		return err
 	}

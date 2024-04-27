@@ -2,10 +2,13 @@ package db
 
 import (
 	"context"
+	"fmt"
+	"log/slog"
+	"strconv"
+
 	"github.com/google/uuid"
 	"github.com/mbaitar/levenue-assignment/types"
 	"github.com/uptrace/bun"
-	"time"
 )
 
 func GetAccountByUserID(userID uuid.UUID) (types.Account, error) {
@@ -74,7 +77,7 @@ func CalculateMRR(userID uuid.UUID) (float64, error) {
 	return totalMRR, err
 }
 
-func CalculateChurn(fromDate time.Time, userID uuid.UUID) (int, error) {
+func CalculateChurn(fromDate string, userID uuid.UUID) (int, error) {
 	churned, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		Where("cancel_at_period_end = 1 OR status = 'canceled'").
@@ -88,7 +91,7 @@ func CalculateChurn(fromDate time.Time, userID uuid.UUID) (int, error) {
 	return churned, nil
 }
 
-func CalculateChurnedMRR(fromDate time.Time, userID uuid.UUID) (float64, error) {
+func CalculateChurnedMRR(fromDate string, userID uuid.UUID) (float64, error) {
 	var churnedMRR float64
 	err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
@@ -100,17 +103,7 @@ func CalculateChurnedMRR(fromDate time.Time, userID uuid.UUID) (float64, error) 
 	return float64(churnedMRR), err
 }
 
-func CalculateChurnPercentage(fromDate time.Time, userID uuid.UUID) (float64, error) {
-	churned, err := Bun.NewSelect().
-		Model((*types.Subscription)(nil)).
-		ColumnExpr("cancel_at_period_end = 1 OR status = 'canceled'").
-		Where("user_id = ?", userID).
-		Where("created_at >= ?", fromDate).
-		Count(context.Background())
-
-	if err != nil {
-		return 0, err
-	}
+func CalculateChurnPercentage(fromDate string, userID uuid.UUID, churnedAmount int) (float64, error) {
 
 	total, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
@@ -119,20 +112,31 @@ func CalculateChurnPercentage(fromDate time.Time, userID uuid.UUID) (float64, er
 		Count(context.Background())
 
 	if err != nil {
+		slog.Error("churn Percentage failed", "err", err)
 		return 0, err
 	}
 
-	churnPercentage := float64(churned/total) * 100
-	return churnPercentage, nil
+	churnPercentage := (float64(churnedAmount) / float64(total))
+	percentage := churnPercentage * 100
+	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", percentage), 64)
+
+	if err != nil {
+		return 0, err
+	}
+	return value, nil
 }
 
-func CalculateNetGrowth(fromDate time.Time, userID uuid.UUID) (int, error) {
+func CalculateNetGrowth(fromDate string, userID uuid.UUID) (int, error) {
 	newSubs, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		Where("status = 'active'").
 		Where("created_at >= ?", fromDate).
 		Where("user_id = ?", userID).
 		Count(context.Background())
+
+	if err != nil {
+		return 0, err
+	}
 
 	canceledSubs, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
@@ -164,6 +168,17 @@ func GetMetricByUserID(userID uuid.UUID) (types.Metric, error) {
 	err := Bun.NewSelect().
 		Model(&metric).
 		Where("user_id = ?", userID.String()).
+		Scan(context.Background())
+	return metric, err
+}
+
+func GetLatestMetricByUserID(userID uuid.UUID) (types.Metric, error) {
+	var metric types.Metric
+	err := Bun.NewSelect().
+		Model(&metric).
+		Where("user_id = ?", userID.String()).
+		Order("id DESC").
+		Limit(1).
 		Scan(context.Background())
 	return metric, err
 }
