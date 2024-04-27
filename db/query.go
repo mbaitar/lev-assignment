@@ -104,7 +104,6 @@ func CalculateChurnedMRR(fromDate string, userID uuid.UUID) (float64, error) {
 }
 
 func CalculateChurnPercentage(fromDate string, userID uuid.UUID, churnedAmount int) (float64, error) {
-
 	total, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		Where("status = 'active'").
@@ -118,11 +117,12 @@ func CalculateChurnPercentage(fromDate string, userID uuid.UUID, churnedAmount i
 
 	churnPercentage := (float64(churnedAmount) / float64(total))
 	percentage := churnPercentage * 100
-	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", percentage), 64)
 
+	value, err := strconv.ParseFloat(fmt.Sprintf("%.2f", percentage), 64)
 	if err != nil {
 		return 0, err
 	}
+
 	return value, nil
 }
 
