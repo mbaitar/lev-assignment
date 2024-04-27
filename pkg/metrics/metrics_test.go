@@ -3,10 +3,11 @@ package metrics
 import (
 	"context"
 	"database/sql"
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/sqlitedialect"
 	"testing"
 	"time"
+
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
 
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3" // Ensure SQLite is imported

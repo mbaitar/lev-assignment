@@ -4,91 +4,82 @@ import "github.com/mbaitar/levenue-assignment/view"
 import "github.com/mbaitar/levenue-assignment/view/layout"
 import "github.com/mbaitar/levenue-assignment/types"
 
-
 type ViewData struct {
-	Metrics     types.Metric
-	Sellers     []types.Metric
+	Metrics types.Metric
+	Sellers []types.Metric
 }
 
 templ Index(data ViewData) {
 	@layout.App(true) {
-        <div class="w-full max-w-screen-xl h-[calc(100vh-69px)] mx-auto text-center py-12">
-            <h1 class="text-5xl font-black leading-[1.2] mb-2">
-                Welcome to the dashboard
-            </h1>
-            <div class="flex justify-center align-center">
-                if view.AuthenticatedUser(ctx).Type == "SELLER" {
-                    @SellerMetrics(data)
-                }
-                if view.AuthenticatedUser(ctx).Type == "BUYER" {
-                    @BuyerForm(data.Sellers)
-                }
-            </div>
-        </div>
-    }
+		<div class="w-full max-w-screen-xl h-[calc(100vh-69px)] mx-auto text-center py-12">
+			<h1 class="text-5xl font-black leading-[1.2] mb-2">
+				Welcome to the dashboard
+			</h1>
+			<div class="flex justify-center align-center">
+				if view.AuthenticatedUser(ctx).Type == "SELLER" {
+					@SellerMetrics(data)
+				}
+				if view.AuthenticatedUser(ctx).Type == "BUYER" {
+					@BuyerForm(data.Sellers)
+				}
+			</div>
+		</div>
+	}
 }
 
 templ BuyerForm(sellers []types.Metric) {
-<form hx-post="/trade">
-    <div class="container pt-4">
-        <div class="flex justify-center align-center">
-          <div class="card w-96 shadow-xl p-4">
-            <div>
-             <h3 class="text-xl leading-[1.2] mb-2">Trade window</h3>
-            </div>
-
-                <label class="form-control w-full max-w">
-                    <div class="label">
-                        <span class="label-text">ARR (12-month period)</span>
-                    </div>
-                    <input class="input input-bordered w-full" type="number" name="arr"/>
-                </label>
-                <button class="btn btn-primary w-full mt-4 text-center">Trade<i class="fa-solid fa-money-bill"></i></button>
-
-          </div>
-        </div>
-    </div>
-</form>
+	<form hx-post="/trade">
+		<div class="container pt-4">
+			<div class="flex justify-center align-center">
+				<div class="card w-96 shadow-xl p-4">
+					<div>
+						<h3 class="text-xl leading-[1.2] mb-2">Trade window</h3>
+					</div>
+					<label class="form-control w-full max-w">
+						<div class="label">
+							<span class="label-text">ARR (12-month period)</span>
+						</div>
+						<input class="input input-bordered w-full" type="number" name="arr"/>
+					</label>
+					<button class="btn btn-primary w-full mt-4 text-center">Trade<i class="fa-solid fa-money-bill"></i></button>
+				</div>
+			</div>
+		</div>
+	</form>
 }
 
 templ SellerMetrics(data ViewData) {
-    <div>
-        <div>
-            <div class="stats stats-vertical lg:stats-horizontal shadow">
-              <div class="stat">
-                <div class="stat-title">MRR</div>
-                <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.MRR)) }</div>
-              </div>
-
-              <div class="stat">
-                <div class="stat-title">Churned subscriptions</div>
-                <div class="stat-value">{ view.String(int(data.Metrics.ChurnAmount)) }</div>
-              </div>
-
-              <div class="stat">
-                <div class="stat-title">Churned MRR</div>
-                <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.ChurnedMRR)) }</div>
-              </div>
-
-              <div class="stat">
-                <div class="stat-title">Churned %</div>
-                <div class="stat-value">{ view.String(int(data.Metrics.ChurnedPercentage)) }%</div>
-              </div>
-
-              <div class="stat">
-                <div class="stat-title">Net Growth</div>
-                <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.NetGrowth)) }</div>
-              </div>
-
-              <div class="stat">
-                <div class="stat-title">Trading limit</div>
-                <div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.TradingLimit)) }</div>
-              </div>
-            </div>
-        </div>
-        <div class="inline-flex align-stert justify-center w-full">
-            <p class="text-xs"><i class="fa-solid fa-circle-info px-1"></i>Data is shown is calculated YTD</p>
-        </div>
-    </div>
+	<div>
+		<div>
+			<div class="stats stats-vertical lg:stats-horizontal shadow">
+				<div class="stat">
+					<div class="stat-title">MRR</div>
+					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.MRR)) }</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Churned subscriptions</div>
+					<div class="stat-value">{ view.String(int(data.Metrics.ChurnAmount)) }</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Churned MRR</div>
+					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.ChurnedMRR)) }</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Churned %</div>
+					<div class="stat-value">{ view.String(int(data.Metrics.ChurnedPercentage)) }%</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Net Growth</div>
+					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.NetGrowth)) }</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Trading limit</div>
+					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.TradingLimit)) }</div>
+				</div>
+			</div>
+		</div>
+		<div class="inline-flex align-stert justify-center w-full">
+			<p class="text-xs"><i class="fa-solid fa-circle-info px-1"></i>Data is shown is calculated YTD</p>
+		</div>
+	</div>
 }
-

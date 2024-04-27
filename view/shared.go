@@ -3,9 +3,10 @@ package view
 import (
 	"context"
 	"fmt"
-	"github.com/mbaitar/levenue-assignment/types"
 	"strconv"
 	"strings"
+
+	"github.com/mbaitar/levenue-assignment/types"
 )
 
 func AuthenticatedUser(ctx context.Context) types.AuthenticatedUser {

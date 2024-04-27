@@ -4,53 +4,52 @@ import "github.com/mbaitar/levenue-assignment/view"
 import "github.com/mbaitar/levenue-assignment/view/layout"
 import "github.com/mbaitar/levenue-assignment/types"
 
-
 type HistoryData struct {
-	Trades     []types.Trade
+	Trades []types.Trade
 }
 
 templ Index(data HistoryData) {
 	@layout.App(true) {
-        <div class="w-full max-w-screen-xl h-[calc(100vh-69px)] mx-auto text-center py-12">
-            <h1 class="text-5xl font-black leading-[1.2] mb-2">
-                Trade history
-            </h1>
-            <div class="flex justify-center align-center">
-                if view.AuthenticatedUser(ctx).Type == "BUYER" {
-                    @HistoryTable(data.Trades)
-                }
-            </div>
-        </div>
-    }
+		<div class="w-full max-w-screen-xl h-[calc(100vh-69px)] mx-auto text-center py-12">
+			<h1 class="text-5xl font-black leading-[1.2] mb-2">
+				Trade history
+			</h1>
+			<div class="flex justify-center align-center">
+				if view.AuthenticatedUser(ctx).Type == "BUYER" {
+					@HistoryTable(data.Trades)
+				}
+			</div>
+		</div>
+	}
 }
 
 templ HistoryTable(trades []types.Trade) {
-    <div class="overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>ARR</th>
-            <th>ROI</th>
-            <th>ROI %</th>
-            <th>Discount per unit</th>
-            <th>Net Profit</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-            for _, trade := range trades {
-              <tr>
-                <th>{view.String(trade.TradeID)}</th>
-                <td>{view.FormatCurrency(trade.ARRTraded)}</td>
-                <td>{view.FormatCurrency(trade.ROI)}</td>
-                <td>{view.String(int(trade.ROIPercentage))}%</td>
-                <td>{view.Float64(trade.DiscountRate)}</td>
-                <td>{view.FormatCurrency(trade.NetProfit)}</td>
-                <td>{trade.TradeDate.String()}</td>
-              </tr>
-             }
-        </tbody>
-      </table>
-    </div>
+	<div class="overflow-x-auto">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>ARR</th>
+					<th>ROI</th>
+					<th>ROI %</th>
+					<th>Discount per unit</th>
+					<th>Net Profit</th>
+					<th>Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, trade := range trades {
+					<tr>
+						<th>{ view.String(trade.TradeID) }</th>
+						<td>{ view.FormatCurrency(trade.ARRTraded) }</td>
+						<td>{ view.FormatCurrency(trade.ROI) }</td>
+						<td>{ view.String(int(trade.ROIPercentage)) }%</td>
+						<td>{ view.Float64(trade.DiscountRate) }</td>
+						<td>{ view.FormatCurrency(trade.NetProfit) }</td>
+						<td>{ trade.TradeDate.String() }</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 }

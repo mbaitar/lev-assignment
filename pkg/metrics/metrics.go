@@ -1,11 +1,12 @@
 package metrics
 
 import (
+	"log/slog"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/types"
-	"log/slog"
-	"time"
 )
 
 const discountRate = 0.88

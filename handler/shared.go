@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/a-h/templ"
-	"github.com/mbaitar/levenue-assignment/types"
 	"log/slog"
 	"net/http"
+
+	"github.com/a-h/templ"
+	"github.com/mbaitar/levenue-assignment/types"
 )
 
 func Make(h func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {

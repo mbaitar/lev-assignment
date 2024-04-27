@@ -5,6 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log/slog"
+	"net/http"
+	"os"
+	"strconv"
+
 	"github.com/google/uuid"
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/pkg/metrics"
@@ -15,10 +20,6 @@ import (
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/oauth"
 	"github.com/uptrace/bun"
-	"log/slog"
-	"net/http"
-	"os"
-	"strconv"
 
 	"github.com/gorilla/sessions"
 	"github.com/nedpals/supabase-go"

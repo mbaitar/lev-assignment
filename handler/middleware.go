@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"net/http"
+	"os"
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/pkg/sb"
 	"github.com/mbaitar/levenue-assignment/types"
-	"net/http"
-	"os"
-	"strings"
 )
 
 func WithUser(next http.Handler) http.Handler {

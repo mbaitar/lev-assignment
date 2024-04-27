@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/view/history"
-	"net/http"
 )
 
 func HandleHistoryIndex(w http.ResponseWriter, r *http.Request) error {

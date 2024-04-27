@@ -3,15 +3,16 @@ package strp
 import (
 	"context"
 	"database/sql"
+	"log/slog"
+	"os"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/types"
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/subscription"
 	"github.com/uptrace/bun"
-	"log/slog"
-	"os"
-	"time"
 )
 
 func FetchAllSubscriptions(token types.IntegrationToken, userID uuid.UUID) error {

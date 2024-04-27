@@ -1,11 +1,12 @@
 package handler
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/pkg/metrics"
 	"github.com/mbaitar/levenue-assignment/view/dashboard"
-	"net/http"
-	"strconv"
 )
 
 func HandleDashboardIndex(w http.ResponseWriter, r *http.Request) error {
