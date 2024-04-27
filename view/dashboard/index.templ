@@ -3,6 +3,7 @@ package dashboard
 import "github.com/mbaitar/levenue-assignment/view"
 import "github.com/mbaitar/levenue-assignment/view/layout"
 import "github.com/mbaitar/levenue-assignment/types"
+import "os"
 
 type ViewData struct {
 	Metrics types.Metric
@@ -57,8 +58,11 @@ templ SellerMetrics(data ViewData) {
 					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.MRR)) }</div>
 				</div>
 				<div class="stat">
-					<div class="stat-title">Churned subscriptions</div>
-					<div class="stat-value">{ view.String(int(data.Metrics.ChurnAmount)) }</div>
+					<div class="stat-title">Churned</div>
+					<div class="stat-value">
+						{ view.String(int(data.Metrics.ChurnAmount)) }
+						<p class="text-sm">subs</p>
+					</div>
 				</div>
 				<div class="stat">
 					<div class="stat-title">Churned MRR</div>
@@ -70,7 +74,10 @@ templ SellerMetrics(data ViewData) {
 				</div>
 				<div class="stat">
 					<div class="stat-title">Net Growth</div>
-					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.NetGrowth)) }</div>
+					<div class="stat-value">
+						{ view.String(int(data.Metrics.NetGrowth)) }
+						<p class="text-sm">subs</p>
+					</div>
 				</div>
 				<div class="stat">
 					<div class="stat-title">Trading limit</div>
@@ -81,5 +88,12 @@ templ SellerMetrics(data ViewData) {
 		<div class="inline-flex align-stert justify-center w-full">
 			<p class="text-xs"><i class="fa-solid fa-circle-info px-1"></i>Data is shown is calculated YTD</p>
 		</div>
+		if os.Getenv("APP_ENV") == "STAG" {
+			<div>
+				<form hx-post="/rerun" hx-swap="outerHTML" class="flex justify-center">
+					<button class="btn btn-primary">Rerun calculations</button>
+				</form>
+			</div>
+		}
 	</div>
 }

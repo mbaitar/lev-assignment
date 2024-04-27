@@ -41,3 +41,21 @@ func HandleTradeCreate(w http.ResponseWriter, r *http.Request) error {
 	}
 	return hxRedirect(w, r, "/history")
 }
+
+func HandleRunMetricCalculation(w http.ResponseWriter, r *http.Request) error {
+	user := getAuthenticatedUser(r)
+	err := metrics.CalculateMetrics(user.ID)
+	if err != nil {
+		return err
+	}
+	metrics, err := db.GetLatestMetricByUserID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	data := dashboard.ViewData{
+		Metrics: metrics,
+	}
+
+	return render(r, w, dashboard.Index(data))
+}

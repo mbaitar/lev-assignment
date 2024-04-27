@@ -2,15 +2,16 @@ package main
 
 import (
 	"embed"
+	"log"
+	"log/slog"
+	"net/http"
+	"os"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/handler"
 	"github.com/mbaitar/levenue-assignment/pkg/sb"
-	"log"
-	"log/slog"
-	"net/http"
-	"os"
 )
 
 //go:embed public
@@ -49,6 +50,7 @@ func main() {
 	router.Group(func(auth chi.Router) {
 		auth.Use(handler.WithAuth, handler.WithAccountSetup)
 		auth.Get("/dashboard", handler.Make(handler.HandleDashboardIndex))
+		auth.Post("/rerun", handler.Make(handler.HandleRunMetricCalculation))
 		auth.Post("/trade", handler.Make(handler.HandleTradeCreate))
 		auth.Get("/history", handler.Make(handler.HandleHistoryIndex))
 	})

@@ -97,6 +97,7 @@ func CalculateChurnedMRR(fromDate string, userID uuid.UUID) (float64, error) {
 		Model((*types.Subscription)(nil)).
 		ColumnExpr("SUM(amount) AS churned_mrr").
 		Where("cancel_at_period_end = 1 OR status = 'canceled'").
+		Where("created_At >= ?", fromDate).
 		Where("user_id = ?", userID).
 		Scan(context.Background(), &churnedMRR)
 
