@@ -34,7 +34,7 @@ func CalculateMetrics(user uuid.UUID) error {
 		return err
 	}
 
-	netGrowth, err := db.CalculateNetGrowth(from, user)
+	netGrowth, err := db.CalculateNetGrowth(from, user, churnAmount)
 	if err != nil {
 		return err
 	}

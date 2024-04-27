@@ -126,7 +126,7 @@ func CalculateChurnPercentage(fromDate string, userID uuid.UUID, churnedAmount i
 	return value, nil
 }
 
-func CalculateNetGrowth(fromDate string, userID uuid.UUID) (int, error) {
+func CalculateNetGrowth(fromDate string, userID uuid.UUID, churnedAmount int) (int, error) {
 	newSubs, err := Bun.NewSelect().
 		Model((*types.Subscription)(nil)).
 		Where("status = 'active'").
@@ -138,14 +138,7 @@ func CalculateNetGrowth(fromDate string, userID uuid.UUID) (int, error) {
 		return 0, err
 	}
 
-	canceledSubs, err := Bun.NewSelect().
-		Model((*types.Subscription)(nil)).
-		ColumnExpr("cancel_at_period_end = 1 OR status = 'canceled'").
-		Where("created_at >= ?", fromDate).
-		Where("user_id = ?", userID).
-		Count(context.Background())
-
-	netGrowth := newSubs - canceledSubs
+	netGrowth := newSubs - churnedAmount
 	return netGrowth, err
 }
 
