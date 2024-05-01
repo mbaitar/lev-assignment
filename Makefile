@@ -1,6 +1,6 @@
 build:
 	@templ generate view
-	@go build -tags prod -o bin/app .
+	@go build -tags dev -o bin/app .
 
 databuild:
 	@go build -o bin/data cmd/data/main.go
