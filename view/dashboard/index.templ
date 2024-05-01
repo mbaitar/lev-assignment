@@ -3,11 +3,13 @@ package dashboard
 import "github.com/mbaitar/levenue-assignment/view"
 import "github.com/mbaitar/levenue-assignment/view/layout"
 import "github.com/mbaitar/levenue-assignment/types"
+import "github.com/mbaitar/levenue-assignment/view/components"
 import "os"
 
 type ViewData struct {
-	Metrics types.Metric
-	Sellers []types.Metric
+	Metrics       types.Metric
+	Sellers       []types.Metric
+	MrrTimeValues []types.TimeValue
 }
 
 templ Index(data ViewData) {
@@ -51,49 +53,49 @@ templ BuyerForm(sellers []types.Metric) {
 
 templ SellerMetrics(data ViewData) {
 	<div>
-		<div>
-			<div class="stats stats-vertical lg:stats-horizontal shadow">
-				<div class="stat">
-					<div class="stat-title">MRR</div>
-					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.MRR)) }</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Churned</div>
-					<div class="stat-value">
-						{ view.String(int(data.Metrics.ChurnAmount)) }
-						<p class="text-sm">subs</p>
-					</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Churned MRR</div>
-					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.ChurnedMRR)) }</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Churned %</div>
-					<div class="stat-value">{ view.FormatPercentage(data.Metrics.ChurnedPercentage) }</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Net Growth</div>
-					<div class="stat-value">
-						{ view.String(int(data.Metrics.NetGrowth)) }
-						<p class="text-sm">subs</p>
-					</div>
-				</div>
-				<div class="stat">
-					<div class="stat-title">Trading limit</div>
-					<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.TradingLimit)) }</div>
-				</div>
-			</div>
-		</div>
-		<div class="inline-flex align-stert justify-center w-full">
-			<p class="text-xs"><i class="fa-solid fa-circle-info px-1"></i>Data is shown is calculated YTD</p>
-		</div>
-		if os.Getenv("APP_ENV") == "STAG" {
+		<form hx-post="/rerun" hx-swap="innerHTML">
 			<div>
-				<form hx-post="/rerun" hx-swap="outerHTML" class="flex justify-center">
-					<button class="btn btn-primary">Rerun calculations</button>
-				</form>
+				<div class="stats stats-vertical lg:stats-horizontal shadow">
+					<div class="stat">
+						<div class="stat-title">MRR</div>
+						<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.MRR)) }</div>
+					</div>
+					<div class="stat">
+						<div class="stat-title">Churned</div>
+						<div class="stat-value">
+							{ view.String(int(data.Metrics.ChurnAmount)) }
+							<p class="text-sm">subs</p>
+						</div>
+					</div>
+					<div class="stat">
+						<div class="stat-title">Churned MRR</div>
+						<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.ChurnedMRR)) }</div>
+					</div>
+					<div class="stat">
+						<div class="stat-title">Churned %</div>
+						<div class="stat-value">{ view.FormatPercentage(data.Metrics.ChurnedPercentage) }</div>
+					</div>
+					<div class="stat">
+						<div class="stat-title">Net Growth</div>
+						<div class="stat-value">
+							{ view.String(int(data.Metrics.NetGrowth)) }
+							<p class="text-sm">subs</p>
+						</div>
+					</div>
+					<div class="stat">
+						<div class="stat-title">Trading limit</div>
+						<div class="stat-value">{ view.FormatCurrency(float64(data.Metrics.TradingLimit)) }</div>
+					</div>
+				</div>
 			</div>
-		}
+			<div class="inline-flex align-stert justify-center w-full">
+				<p class="text-xs"><i class="fa-solid fa-circle-info px-1"></i>Data is shown is calculated YTD</p>
+			</div>
+			if os.Getenv("APP_ENV") == "STAG" {
+				<button class="btn btn-primary">Rerun calculations</button>
+			}
+			<section id="lineChart"></section>
+			@components.LineGraph(data.MrrTimeValues, "lineChart")
+		</form>
 	</div>
 }

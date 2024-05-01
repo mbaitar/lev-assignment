@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/mbaitar/levenue-assignment/db"
 	"github.com/mbaitar/levenue-assignment/pkg/metrics"
+	"github.com/mbaitar/levenue-assignment/types"
 	"github.com/mbaitar/levenue-assignment/view/dashboard"
 )
 
@@ -16,14 +19,51 @@ func HandleDashboardIndex(w http.ResponseWriter, r *http.Request) error {
 		if err != nil {
 			return err
 		}
-
+		chartDataMrr := CreateChartData()
 		data := dashboard.ViewData{
-			Metrics: metrics,
+			Metrics:       metrics,
+			MrrTimeValues: chartDataMrr,
 		}
 
 		return render(r, w, dashboard.Index(data))
 	}
 	return render(r, w, dashboard.Index(dashboard.ViewData{}))
+}
+
+func CreateChartData() []types.TimeValue {
+	// Data to be converted into []TimeValue
+	data := []struct {
+		Time  string
+		Value float64
+	}{
+		{Time: "2019-04-11", Value: 80.01},
+		{Time: "2019-04-12", Value: 96.63},
+		{Time: "2019-04-13", Value: 76.64},
+		{Time: "2019-04-14", Value: 81.89},
+		{Time: "2019-04-15", Value: 74.43},
+		{Time: "2019-04-16", Value: 80.01},
+		{Time: "2019-04-17", Value: 96.63},
+		{Time: "2019-04-18", Value: 76.64},
+		{Time: "2019-04-19", Value: 81.89},
+		{Time: "2019-04-20", Value: 74.43},
+	}
+
+	// Slice to hold the TimeValue structs
+	var timeValues []types.TimeValue
+
+	// Parse time strings and create TimeValue structs
+	for _, d := range data {
+		parsedTime, err := time.Parse("2006-01-02", d.Time)
+		if err != nil {
+			fmt.Printf("Error parsing time: %v\n", err)
+			continue
+		}
+		timeValues = append(timeValues, types.TimeValue{
+			Time:  parsedTime,
+			Value: d.Value,
+		})
+	}
+	return timeValues
 }
 
 func HandleTradeCreate(w http.ResponseWriter, r *http.Request) error {
